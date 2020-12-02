@@ -7,6 +7,38 @@ function createApp() {
     let { pathname } = url.parse(req.url, true);
 
     let index = 0;
+
+    let exeErrMiddle = (err, handler) => {
+      if (handler.length === 4) {
+        handler(err, req, res, next);
+      } else {
+        next(err);
+      }
+    };
+
+    let exeMiddle = (path, handler) => {
+      if (
+        path === "/" ||
+        path === pathname ||
+        pathname.startsWith(path + "/")
+      ) {
+        handler(req, res, next);
+      } else {
+        next();
+      }
+    };
+
+    let exeRoute = (method, path, handler) => {
+      if (
+        (method === reqMethod || method === "all") &&
+        (path === pathname || path === "*")
+      ) {
+        handler(req, res);
+      } else {
+        next();
+      }
+    };
+
     function next(err) {
       if (index === app.routes.length) {
         return res.end(`cannot ${reqMethod} ${pathname}`);
@@ -14,32 +46,11 @@ function createApp() {
       let { method, path, handler } = app.routes[index++];
 
       if (err) {
-        if (handler.length === 4) {
-          handler(err, req, res, next);
-        } else {
-          next(err);
-        }
+        exeErrMiddle(err, handler);
+      } else if (method === "middle") {
+        exeMiddle(path, handler);
       } else {
-        if (method === "middle") {
-          if (
-            path === "/" ||
-            path === pathname ||
-            pathname.startsWith(path + "/")
-          ) {
-            handler(req, res, next);
-          } else {
-            next();
-          }
-        } else {
-          if (
-            (method === reqMethod || method === "all") &&
-            (path === pathname || path === "*")
-          ) {
-            handler(req, res);
-          } else {
-            next();
-          }
-        }
+        exeRoute(method, path, handler);
       }
     }
 
