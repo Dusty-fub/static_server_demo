@@ -7,29 +7,38 @@ function createApp() {
     let { pathname } = url.parse(req.url, true);
 
     let index = 0;
-    function next() {
+    function next(err) {
       if (index === app.routes.length) {
         return res.end(`cannot ${reqMethod} ${pathname}`);
       }
       let { method, path, handler } = app.routes[index++];
-      if (method === "middle") {
-        if (
-          path === "/" ||
-          path === pathname ||
-          pathname.startsWith(path + "/")
-        ) {
-          handler(req, res, next);
+
+      if (err) {
+        if (handler.length === 4) {
+          handler(err, req, res, next);
         } else {
-          next();
+          next(err);
         }
       } else {
-        if (
-          (method === reqMethod || method === "all") &&
-          (path === pathname || path === "*")
-        ) {
-          handler(req, res);
+        if (method === "middle") {
+          if (
+            path === "/" ||
+            path === pathname ||
+            pathname.startsWith(path + "/")
+          ) {
+            handler(req, res, next);
+          } else {
+            next();
+          }
         } else {
-          next();
+          if (
+            (method === reqMethod || method === "all") &&
+            (path === pathname || path === "*")
+          ) {
+            handler(req, res);
+          } else {
+            next();
+          }
         }
       }
     }

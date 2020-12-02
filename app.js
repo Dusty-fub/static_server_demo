@@ -3,9 +3,8 @@ const express = require("./express");
 let app = express();
 
 app.use("/", (req, res, next) => {
-  console.log("执行中间件");
   res.setHeader("Content-Type", "text/html;charset=utf-8");
-  next();
+  next("middle error msg");
 });
 
 app.get("/", (req, res) => {
@@ -18,6 +17,14 @@ app.post("/", (req, res) => {
 
 app.all("*", (req, res) => {
   res.end("all");
+});
+
+app.use((err, req, res, next) => {
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
 });
 
 app.listen(3000, () => {
