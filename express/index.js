@@ -71,7 +71,14 @@ function createApp() {
     };
     app.routes.push(layer);
   };
-
+  app.use((req, res, next) => {
+    let { pathname, query } = url.parse(req.url, true);
+    let hostname = req.headers["host"].split(":")[0];
+    req.pathname = pathname;
+    req.hostname = hostname;
+    req.query = query;
+    next();
+  });
   app.all = (path, handler) => {
     let layer = {
       method: "all",

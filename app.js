@@ -4,6 +4,9 @@ let app = express();
 
 app.use("/", (req, res, next) => {
   res.setHeader("Content-Type", "text/html;charset=utf-8");
+  console.log(req.hostname);
+  console.log(req.pathname);
+  console.log({ ...req.query });
   next("middle error msg");
 });
 
