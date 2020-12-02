@@ -18,7 +18,6 @@ ajax = (method, url, options) => {
 ajax('GET', '/friends.json')
     .then(
         (response) => {
-            console.log('success')
             friends = JSON.parse(response)
             friends.forEach(item => {
                 $(".friends").append(`
@@ -30,7 +29,6 @@ ajax('GET', '/friends.json')
             })
         },
         (response) => {
-            console.log('fail')
             console.log(response.status);
         }
     )
