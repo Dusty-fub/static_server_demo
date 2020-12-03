@@ -2,5 +2,5 @@
 
 ## 启动
   ```
-  node-dev server.js 8888
+  node app.js
   ```
