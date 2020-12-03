@@ -79,6 +79,19 @@ function createApp() {
     req.query = query;
     next();
   });
+
+  app.use((req, res, next) => {
+    let postDate = "";
+    req.on("data", (chunk) => {
+      postDate += chunk;
+    });
+
+    req.on("end", () => {
+      console.log(postDate);
+    });
+    next();
+  });
+
   app.all = (path, handler) => {
     let layer = {
       method: "all",
